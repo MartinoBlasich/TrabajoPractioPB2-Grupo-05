@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Equipo {
+public class Equipo implements Comparable<Equipo>, EstadisticaDeportiva {
 	private Map<String, Jugador> jugadores;
 	private String nombre;
 	private Integer partidosJugados;
 	private Integer partidosGanados;
 	private Integer puntosTotales;
+	private Integer diferenciaDeSets;
 
 	public Equipo(String nombre) {
 		this.nombre = nombre;
@@ -17,6 +18,7 @@ public class Equipo {
 		this.partidosGanados = 0;
 		this.partidosJugados = 0;
 		this.puntosTotales = 0;
+		this.diferenciaDeSets = 0;
 	}
 
 	public Map<String, Jugador> getJugadores() {
@@ -44,9 +46,37 @@ public class Equipo {
 		return jugadores.containsKey(jugador.getDni());
 	}
 
+	void incrementarPartidosJugados() {
+		this.partidosJugados++;
+	}
+
+	void agregarPuntos(Integer puntos) {
+		this.puntosTotales += puntos;
+	}
+
+	void incrementarPartidosGanados() {
+		this.partidosGanados++;
+	}
+
+	void actualizarDiferenciaDeSets(Integer setsAFavor, Integer setsEnContra) {
+		this.diferenciaDeSets += setsAFavor - setsEnContra;
+	}
+
+	@Override
+	public int compareTo(Equipo otroEquipo) {
+		int resultado = otroEquipo.puntosTotales.compareTo(this.puntosTotales);
+		if (resultado == 0) {
+			resultado = otroEquipo.diferenciaDeSets.compareTo(this.diferenciaDeSets);
+		}
+		if (resultado == 0) {
+			resultado = this.nombre.compareTo(otroEquipo.nombre);
+		}
+		return resultado;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(jugadores, nombre, partidosGanados, partidosJugados, puntosTotales);
+		return Objects.hash(jugadores, nombre, partidosGanados, partidosJugados, puntosTotales, diferenciaDeSets);
 	}
 
 	@Override
@@ -61,7 +91,14 @@ public class Equipo {
 		return Objects.equals(jugadores, other.jugadores) && Objects.equals(nombre, other.nombre)
 				&& Objects.equals(partidosGanados, other.partidosGanados)
 				&& Objects.equals(partidosJugados, other.partidosJugados)
-				&& Objects.equals(puntosTotales, other.puntosTotales);
+				&& Objects.equals(puntosTotales, other.puntosTotales)
+				&& Objects.equals(diferenciaDeSets, other.diferenciaDeSets);
+	}
+
+	@Override
+	public Double calcularEfectividad() {
+		return (partidosGanados / partidosJugados) * 100.0;
+		
 	}
 
 	

@@ -15,7 +15,7 @@ public class SistemaGestionVoleyTest {
 	private Miembro jugador1;
 	private Miembro jugador2;
 	private Miembro jugador3;
-	private Equipo river;
+	private Arbitro arbitro;
 	private Partido partido;
 
 	@Before
@@ -24,11 +24,13 @@ public class SistemaGestionVoleyTest {
 		jugador1 = new Jugador("Martino", "48067068", LocalDate.of(2008, 03, 04), 6, PosicionEnum.PUNTA, true);
 		jugador2 = new Jugador("Daniel", "44089012", LocalDate.of(2004, 05, 07), 43, PosicionEnum.CENTRAL, false);
 		jugador3 = new Jugador("Agus", "47034876", LocalDate.of(2008, 06, 13), 38, PosicionEnum.CENTRAL, true);
+		arbitro = new Arbitro("Teo", "34958857", LocalDate.of(2002, 03, 07), CategoriaEnum.SUB18, 20000.0);
 	}
 
 	// Gestión de Jugadores
 	@Test
-	public void agregarCorrectamenteUnJugadorAlEquipo() throws EquipoNoEncontradoException, JugadorNoFederadoException {
+	public void agregarCorrectamenteUnJugadorAlEquipo() throws EquipoNoEncontradoException, JugadorNoFederadoException,
+			PosicionInvalidaException, CupoEquipoLlenoException, DocumentoInvalidoException {
 		liga.registrarEquipo("Boca");
 
 		assertTrue(liga.agregarJugadorAlEquipo((Jugador) jugador1, "Boca"));
@@ -36,7 +38,8 @@ public class SistemaGestionVoleyTest {
 
 	@Test
 	public void darDeBajaUnJugadorRegistrado()
-			throws EquipoNoEncontradoException, JugadorNoFederadoException, JugadorNoEncontradoException {
+			throws EquipoNoEncontradoException, JugadorNoFederadoException, JugadorNoEncontradoException,
+			PosicionInvalidaException, CupoEquipoLlenoException, DocumentoInvalidoException {
 		liga.registrarEquipo("Boca");
 
 		assertTrue(liga.agregarJugadorAlEquipo((Jugador) jugador1, "Boca"));
@@ -44,7 +47,9 @@ public class SistemaGestionVoleyTest {
 	}
 
 	@Test
-	public void queSePuedaActualizarElNumeroDeCamisetaDeUnJugador() throws JugadorNoEncontradoException, EquipoNoEncontradoException, JugadorNoFederadoException {
+	public void queSePuedaActualizarElNumeroDeCamisetaDeUnJugador()
+			throws JugadorNoEncontradoException, EquipoNoEncontradoException, JugadorNoFederadoException,
+			PosicionInvalidaException, CupoEquipoLlenoException, DocumentoInvalidoException {
 		liga.registrarEquipo("Boca");
 
 		assertTrue(liga.agregarJugadorAlEquipo((Jugador) jugador1, "Boca"));
@@ -58,25 +63,33 @@ public class SistemaGestionVoleyTest {
 	}
 
 	@Test(expected = JugadorNoFederadoException.class)
-	public void lanzarJugadorNoFederadoExceptionCuandoSeAgregaJugadorSinAptoMedico() throws JugadorNoFederadoException, EquipoNoEncontradoException {
+	public void lanzarJugadorNoFederadoExceptionCuandoSeAgregaJugadorSinAptoMedico()
+			throws JugadorNoFederadoException, EquipoNoEncontradoException, PosicionInvalidaException,
+			CupoEquipoLlenoException, DocumentoInvalidoException {
 		liga.agregarJugadorAlEquipo((Jugador) jugador2, "Boca");
 	}
 
 	// Control de Plantilla y Partidos
 
 	@Test
-	public void controlarLaCantidadDeJugadoresAgregadosAlEquipo() {
-		liga.agregarJugadorAlEquipo((Jugador)jugador1, "Boca");
-		liga.agregarJugadorAlEquipo((Jugador)jugador3, "Boca");
+	public void controlarLaCantidadDeJugadoresAgregadosAlEquipo()
+			throws EquipoNoEncontradoException, JugadorNoFederadoException, PosicionInvalidaException,
+			CupoEquipoLlenoException, DocumentoInvalidoException {
+		liga.registrarEquipo("Boca");
+		liga.agregarJugadorAlEquipo((Jugador) jugador1, "Boca");
+		liga.agregarJugadorAlEquipo((Jugador) jugador3, "Boca");
 
-		Integer cantidadJugadores = liga.obtenerCantidadJugadoresEquipo("boca");
+		Integer cantidadJugadores = liga.obtenerCantidadJugadoresEquipo("Boca");
 
 		assertEquals(2, cantidadJugadores, 0.0);
 
 	}
 
 	@Test
-	public void alQuitarUnJugadorLaCantidadDeMiembrosDebeDisminuirEnElEquipo() {
+	public void alQuitarUnJugadorLaCantidadDeMiembrosDebeDisminuirEnElEquipo()
+			throws EquipoNoEncontradoException, JugadorNoFederadoException, PosicionInvalidaException,
+			CupoEquipoLlenoException, JugadorNoEncontradoException, DocumentoInvalidoException {
+		liga.registrarEquipo("Boca");
 		liga.agregarJugadorAlEquipo(jugador1, "boca");
 		liga.agregarJugadorAlEquipo(jugador3, "boca");
 
@@ -88,23 +101,83 @@ public class SistemaGestionVoleyTest {
 	}
 
 	@Test
-	public void alRealizarUnPartidoAumentanLosPartidosJugadosDelEquipo() {
+	public void alRealizarUnPartidoAumentanLosPartidosJugadosDelEquipo()
+			throws EquipoIncompletoException, EquipoNoEncontradoException, JugadorNoFederadoException,
+			PosicionInvalidaException, CupoEquipoLlenoException, DocumentoInvalidoException {
 
+		Equipo equipoLocal = liga.registrarEquipo("Boca");
+
+		// Agregar 6 jugadores al equipo
+		for (int i = 0; i < 7; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "3000000" + i, LocalDate.of(2007, 6, 11), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "Boca");
+		}
+
+		Equipo equipoVisitante = liga.registrarEquipo("River");
+
+		// Agregar 6 jugadores al equipo
+		for (int i = 0; i < 7; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "3000000" + i, LocalDate.of(2007, 6, 11), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "River");
+		}
+
+		partido = new Partido(equipoLocal, equipoVisitante, arbitro, true, 2, 3);
+
+		liga.realizarPartido(partido);
+
+		assertEquals(1, equipoLocal.getPartidosJugados(), 0.0);
+		assertEquals(1, equipoVisitante.getPartidosJugados(), 0.0);
 	}
 
-	@Test
-	public void lanzarEquipoIncompletoExceptionCuandoSeIntenteJugarSinSuficientesJugadores() {
+	@Test(expected = EquipoIncompletoException.class)
+	public void lanzarEquipoIncompletoExceptionCuandoSeIntenteJugarSinSuficientesJugadores()
+			throws EquipoIncompletoException {
+		Equipo equipoLocal = new Equipo("Boca");
+		Equipo equipoVisitante = new Equipo("River");
+		partido = new Partido(equipoLocal, equipoVisitante, arbitro, true, 2, 3);
 
+		liga.realizarPartido(partido);
 	}
 
-	@Test
-	public void lanzarPosicionInvalidaExceptionCuandoHayDosLiberos() {
+	@Test(expected = PosicionInvalidaException.class)
+	public void lanzarPosicionInvalidaExceptionCuandoHayDosLiberos()
+			throws EquipoNoEncontradoException, JugadorNoFederadoException, PosicionInvalidaException,
+			CupoEquipoLlenoException, DocumentoInvalidoException {
+		liga.registrarEquipo("Boca");
+		Jugador primerLibero = new Jugador("Libero1", "10000001", LocalDate.of(2007, 9, 3), 1, PosicionEnum.LIBERO,
+				true);
+		Jugador segundoLibero = new Jugador("Libero2", "10000002", LocalDate.of(2007, 11, 5), 2, PosicionEnum.LIBERO,
+				true);
 
+		liga.agregarJugadorAlEquipo(primerLibero, "Boca");
+		liga.agregarJugadorAlEquipo(segundoLibero, "Boca");
 	}
 
-	@Test
-	public void lanzarCupoLlenoExceptionCuandoNoHayLugarEnLaPlantilla() {
+	@Test(expected = CupoEquipoLlenoException.class)
+	public void lanzarCupoLlenoExceptionCuandoNoHayLugarEnLaPlantilla()
+			throws EquipoNoEncontradoException, JugadorNoFederadoException, PosicionInvalidaException,
+			CupoEquipoLlenoException, DocumentoInvalidoException {
+		liga.registrarEquipo("Boca");
 
+		// Registro de 10 jugadores
+		for (int i = 0; i < 10; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "2000000" + i, LocalDate.of(2007, 6, 11), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "Boca");
+		}
+
+		// Registro de 4 jugadores
+		for (int i = 0; i < 4; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "3000000" + i, LocalDate.of(2007, 6, 11), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "Boca");
+		}
+
+		Jugador jugadorFueraDeCupo = new Jugador("Jugador15", "20000015", LocalDate.of(2007, 3, 3), 15,
+				PosicionEnum.PUNTA, true);
+		liga.agregarJugadorAlEquipo(jugadorFueraDeCupo, "Boca");
 	}
 
 	// Cálculo de Puntos y Viáticos
