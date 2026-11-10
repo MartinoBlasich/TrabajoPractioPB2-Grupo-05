@@ -228,109 +228,106 @@ public class SistemaGestionVoleyTest {
 		assertEquals(24000.0, partido.calcularViaticoArbitro(), 0.0);
 	}
 
-
 	// Alta de Usuario
 
-		@Test
-		public void registrarUnArbitroCorrectamente() throws DocumentoInvalidoException {
+	@Test
+	public void registrarUnArbitroCorrectamente() throws DocumentoInvalidoException {
 
-			assertTrue(liga.registrarMiembro(arbitro));
-		}
+		assertTrue(liga.registrarMiembro(arbitro));
+	}
 
-		@Test(expected = DocumentoInvalidoException.class)
-		public void lanzarDocumentoInvalidoException() throws DocumentoInvalidoException {
-			Arbitro arbitro = new Arbitro("Arbitro", "1234A678", LocalDate.of(1985, 10, 1), CategoriaEnum.DIVISION_DE_HONOR,
-					1000.0);
+	@Test(expected = DocumentoInvalidoException.class)
+	public void lanzarDocumentoInvalidoException() throws DocumentoInvalidoException {
+		Arbitro arbitro = new Arbitro("Arbitro", "1234A678", LocalDate.of(1985, 10, 1), CategoriaEnum.DIVISION_DE_HONOR,
+				1000.0);
 
-			liga.registrarMiembro(arbitro);
-		}
+		liga.registrarMiembro(arbitro);
+	}
 
-		@Test
-		public void noSePuedenRegistrarDosMiembrosConElMismoDNI() throws DocumentoInvalidoException {
-			Arbitro arbitro = new Arbitro("Arbitro", "12345678", LocalDate.of(1985, 10, 1), CategoriaEnum.DIVISION_DE_HONOR,
-					1000.0);
-			Jugador jugador = new Jugador("Jugador", "12345678", LocalDate.of(2007, 8, 11), 1, PosicionEnum.PUNTA, true);
+	@Test
+	public void noSePuedenRegistrarDosMiembrosConElMismoDNI() throws DocumentoInvalidoException {
+		Arbitro arbitro = new Arbitro("Arbitro", "12345678", LocalDate.of(1985, 10, 1), CategoriaEnum.DIVISION_DE_HONOR,
+				1000.0);
+		Jugador jugador = new Jugador("Jugador", "12345678", LocalDate.of(2007, 8, 11), 1, PosicionEnum.PUNTA, true);
 
-			assertTrue(liga.registrarMiembro(arbitro));
-			assertFalse(liga.registrarMiembro(jugador));
-		}
+		assertTrue(liga.registrarMiembro(arbitro));
+		assertFalse(liga.registrarMiembro(jugador));
+	}
 
 	// Ordenamiento
 
+	@Test
+	public void ordenarJugadoresPorNombreDeFormaAscendente() {
+		Equipo boca = liga.registrarEquipo("Boca");
+		Equipo river = liga.registrarEquipo("River");
+		boca.registrarJugador(
+				new Jugador("Sofia", "30000001", LocalDate.of(2007, 10, 12), 1, PosicionEnum.PUNTA, true));
+		river.registrarJugador(
+				new Jugador("Ana", "30000002", LocalDate.of(2007, 11, 4), 2, PosicionEnum.CENTRAL, true));
+		boca.registrarJugador(
+				new Jugador("Lucia", "30000003", LocalDate.of(2007, 3, 6), 3, PosicionEnum.OPUESTO, true));
 
-		@Test
-		public void ordenarJugadoresPorNombreDeFormaAscendente() {
-			Equipo boca = liga.registrarEquipo("Boca");
-			Equipo river = liga.registrarEquipo("River");
-			boca.registrarJugador(
-					new Jugador("Sofia", "30000001", LocalDate.of(2007, 10, 12), 1, PosicionEnum.PUNTA, true));
-			river.registrarJugador(
-					new Jugador("Ana", "30000002", LocalDate.of(2007, 11, 4), 2, PosicionEnum.CENTRAL, true));
-			boca.registrarJugador(
-					new Jugador("Lucia", "30000003", LocalDate.of(2007, 3, 6), 3, PosicionEnum.OPUESTO, true));
+		TreeSet<Jugador> jugadores = liga.obtenerJugadoresOrdenadosPorNombre();
 
-			TreeSet<Jugador> jugadores = liga.obtenerJugadoresOrdenadosPorNombre();
+		assertEquals("Ana", jugadores.getFirst().getNombre());
+		assertEquals("Sofia", jugadores.getLast().getNombre());
+	}
 
-			assertEquals("Ana", jugadores.getFirst().getNombre());
-			assertEquals("Sofia", jugadores.getLast().getNombre());
+	@Test
+	public void ordenarLosEquiposPorPuntosDescendenteYDiferenciaDeSets()
+			throws EquipoIncompletoException, NoHayEquiposException, NoHayPartidosException, PartidoInvalidoException,
+			EquipoNoEncontradoException, JugadorNoFederadoException, PosicionInvalidaException,
+			CupoEquipoLlenoException, DocumentoInvalidoException {
+
+		Equipo boca = liga.registrarEquipo("Boca");
+		// Agregar 6 jugadores al equipo
+		for (int i = 0; i < 6; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "1234567" + i, LocalDate.of(2007, 6, 6), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "Boca");
 		}
 
-		@Test
-		public void ordenarLosEquiposPorPuntosDescendenteYDiferenciaDeSets()
-				throws EquipoIncompletoException, NoHayEquiposException, NoHayPartidosException, PartidoInvalidoException,
-				EquipoNoEncontradoException, JugadorNoFederadoException, PosicionInvalidaException,
-				CupoEquipoLlenoException, DocumentoInvalidoException {
-
-			Equipo boca = liga.registrarEquipo("Boca");
-			// Agregar 6 jugadores al equipo
-			for (int i = 0; i < 6; i++) {
-				Jugador jugador = new Jugador("Jugador" + i, "1234567" + i, LocalDate.of(2007, 6, 6), i + 1,
-						PosicionEnum.PUNTA, true);
-				liga.agregarJugadorAlEquipo(jugador, "Boca");
-			}
-
-			//
-			Equipo river = liga.registrarEquipo("River");
-			// Agregar 6 jugadores al equipo
-			for (int i = 0; i < 6; i++) {
-				Jugador jugador = new Jugador("Jugador" + i, "1234567" + i, LocalDate.of(2007, 6, 6), i + 1,
-						PosicionEnum.PUNTA, true);
-				liga.agregarJugadorAlEquipo(jugador, "River");
-			}
-
-			//
-			Equipo lanus = liga.registrarEquipo("Lanus");
-			// Agregar 6 jugadores al equipo
-			for (int i = 0; i < 6; i++) {
-				Jugador jugador = new Jugador("Jugador" + i, "1234567" + i, LocalDate.of(2007, 6, 6), i + 1,
-						PosicionEnum.PUNTA, true);
-				liga.agregarJugadorAlEquipo(jugador, "Lanus");
-			}
-
-			partido = new Partido(boca, river, arbitro, true, 3, 0);
-			liga.realizarPartido(partido);
-			partido.calcularPuntos();
-
-			partido = new Partido(river, lanus, arbitro, true, 3, 1);
-			liga.realizarPartido(partido);
-			partido.calcularPuntos();
-
-			TreeSet<Equipo> equipos = liga.obtenerTablaDePosiciones();
-
-			assertEquals("boca", equipos.getFirst().getNombre());
-			assertEquals("lanus", equipos.getLast().getNombre());
+		//
+		Equipo river = liga.registrarEquipo("River");
+		// Agregar 6 jugadores al equipo
+		for (int i = 0; i < 6; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "1234567" + i, LocalDate.of(2007, 6, 6), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "River");
 		}
 
-		@Test(expected = NoHayEquiposException.class)
-		public void lanzarNoHayEquiposException() throws NoHayEquiposException, NoHayPartidosException {
-			liga.obtenerTablaDePosiciones();
+		//
+		Equipo lanus = liga.registrarEquipo("Lanus");
+		// Agregar 6 jugadores al equipo
+		for (int i = 0; i < 6; i++) {
+			Jugador jugador = new Jugador("Jugador" + i, "1234567" + i, LocalDate.of(2007, 6, 6), i + 1,
+					PosicionEnum.PUNTA, true);
+			liga.agregarJugadorAlEquipo(jugador, "Lanus");
 		}
 
-		@Test(expected = NoHayPartidosException.class)
-		public void lanzarNoHayPartidosException() throws NoHayEquiposException, NoHayPartidosException {
-			liga.registrarEquipo("Boca");
-			liga.obtenerTablaDePosiciones();
-		}
+		partido = new Partido(boca, river, arbitro, true, 3, 0);
+		liga.realizarPartido(partido);
+		partido.calcularPuntos();
 
+		partido = new Partido(river, lanus, arbitro, true, 3, 1);
+		liga.realizarPartido(partido);
+		partido.calcularPuntos();
+
+		TreeSet<Equipo> equipos = liga.obtenerTablaDePosiciones();
+
+		assertEquals("boca", equipos.getFirst().getNombre());
+		assertEquals("lanus", equipos.getLast().getNombre());
+	}
+
+	@Test(expected = NoHayEquiposException.class)
+	public void lanzarNoHayEquiposException() throws NoHayEquiposException, NoHayPartidosException {
+		liga.obtenerTablaDePosiciones();
+	}
+
+	@Test(expected = NoHayPartidosException.class)
+	public void lanzarNoHayPartidosException() throws NoHayEquiposException, NoHayPartidosException {
+		liga.registrarEquipo("Boca");
+		liga.obtenerTablaDePosiciones();
+	}
 
 }
