@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class SistemaGestion {
 	private static final int CUPO_MAXIMO_JUGADORES = 14;
@@ -153,5 +154,24 @@ public class SistemaGestion {
 
 		miembros.put(miembro.getDni(), miembro);
 		return true;
+	}
+	
+	public TreeSet<Jugador> obtenerJugadoresOrdenadosPorNombre() {
+		TreeSet<Jugador> jugadores = new TreeSet<Jugador>();
+		for (Equipo equipo : equipos.values()) {
+			jugadores.addAll(equipo.getJugadores().values());
+		}
+		return jugadores;
+	}
+
+	public TreeSet<Equipo> obtenerTablaDePosiciones() throws NoHayEquiposException, NoHayPartidosException {
+		if (equipos.isEmpty()) {
+			throw new NoHayEquiposException("No hay equipos registrados");
+		}
+		if (partidos.isEmpty()) {
+			throw new NoHayPartidosException("No hay partidos registrados");
+		}
+
+		return new TreeSet<Equipo>(equipos.values());
 	}
 }

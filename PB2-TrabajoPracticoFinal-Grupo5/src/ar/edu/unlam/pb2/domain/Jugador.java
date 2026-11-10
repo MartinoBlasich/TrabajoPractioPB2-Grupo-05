@@ -2,7 +2,7 @@ package ar.edu.unlam.pb2.domain;
 
 import java.time.LocalDate;
 
-public class Jugador extends Miembro {
+public class Jugador extends Miembro implements Comparable<Jugador>{
 
 	private Integer numCamiseta;
 	private PosicionEnum posicionEnum;
@@ -47,6 +47,12 @@ public class Jugador extends Miembro {
 
 	public void cambiarNumeroCamiseta(Integer numero) {
 		this.numCamiseta = numero;
+	}
+	
+	@Override
+	public int compareTo(Jugador o) {
+		
+		return this.nombre.compareTo(o.getNombre());
 	}
 	
 }
