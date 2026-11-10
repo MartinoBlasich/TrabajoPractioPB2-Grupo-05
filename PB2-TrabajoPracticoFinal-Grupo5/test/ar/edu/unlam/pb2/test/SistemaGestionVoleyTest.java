@@ -230,20 +230,29 @@ public class SistemaGestionVoleyTest {
 
 	// Alta de Usuario
 
-	@Test
-	public void registrarUnArbitroCorrectamente() {
+		@Test
+		public void registrarUnArbitroCorrectamente() throws DocumentoInvalidoException {
 
-	}
+			assertTrue(liga.registrarMiembro(arbitro));
+		}
 
-	@Test
-	public void lanzarDocumentoInvalidoException() {
+		@Test(expected = DocumentoInvalidoException.class)
+		public void lanzarDocumentoInvalidoException() throws DocumentoInvalidoException {
+			Arbitro arbitro = new Arbitro("Arbitro", "1234A678", LocalDate.of(1985, 10, 1), CategoriaEnum.DIVISION_DE_HONOR,
+					1000.0);
 
-	}
+			liga.registrarMiembro(arbitro);
+		}
 
-	@Test
-	public void noSePuedenRegistrarDosMiembrosConElMismoDNI() {
+		@Test
+		public void noSePuedenRegistrarDosMiembrosConElMismoDNI() throws DocumentoInvalidoException {
+			Arbitro arbitro = new Arbitro("Arbitro", "12345678", LocalDate.of(1985, 10, 1), CategoriaEnum.DIVISION_DE_HONOR,
+					1000.0);
+			Jugador jugador = new Jugador("Jugador", "12345678", LocalDate.of(2007, 8, 11), 1, PosicionEnum.PUNTA, true);
 
-	}
+			assertTrue(liga.registrarMiembro(arbitro));
+			assertFalse(liga.registrarMiembro(jugador));
+		}
 
 	// Ordenamiento
 

@@ -9,10 +9,12 @@ public class SistemaGestion {
 	private static final int CUPO_MAXIMO_JUGADORES = 14;
 	private List<Partido> partidos;
 	private Map<String, Equipo> equipos;
+	private Map<String, Miembro> miembros;
 
 	public SistemaGestion() {
 		this.partidos = new ArrayList<Partido>();
 		this.equipos = new TreeMap<String, Equipo>();
+		this.miembros = new TreeMap<String, Miembro>();
 	}
 
 	public Equipo registrarEquipo(String equipo) {
@@ -140,5 +142,16 @@ public class SistemaGestion {
 		this.partidos.add(partido);
 		partido.getEquipoLocal().incrementarPartidosJugados();
 		partido.getEquipoVisitante().incrementarPartidosJugados();
+	}
+
+	public Boolean registrarMiembro(Miembro miembro) throws DocumentoInvalidoException {
+		validarDocumento(miembro.getDni());
+
+		if (miembros.containsKey(miembro.getDni())) {
+			return false;
+		}
+
+		miembros.put(miembro.getDni(), miembro);
+		return true;
 	}
 }
