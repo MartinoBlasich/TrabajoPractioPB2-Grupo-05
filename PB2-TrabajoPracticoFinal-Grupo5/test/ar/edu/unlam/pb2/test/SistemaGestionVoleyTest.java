@@ -183,19 +183,50 @@ public class SistemaGestionVoleyTest {
 	// Cálculo de Puntos y Viáticos
 
 	@Test
-	public void calcularLosPuntosTablaPorPartidoGanadoTresCero() {
+	public void calcularLosPuntosTablaPorPartidoGanadoTresCero() throws PartidoInvalidoException {
+		Equipo equipoGanador = liga.registrarEquipo("Boca");
+		Equipo equipoPerdedor = liga.registrarEquipo("River");
+		partido = new Partido(equipoGanador, equipoPerdedor, arbitro, true, 3, 0);
 
+		partido.calcularPuntos();
+
+		assertEquals(3, equipoGanador.getPuntosTotales(), 0.0);
+		assertEquals(0, equipoPerdedor.getPuntosTotales(), 0.0);
 	}
 
 	@Test
-	public void calcularLosPuntosTablaPorPartidoPerdidoEnTieBreak() {
+	public void calcularLosPuntosTablaPorPartidoGanadoTresUno() throws PartidoInvalidoException {
+		Equipo equipoGanador = liga.registrarEquipo("Boca");
+		Equipo equipoPerdedor = liga.registrarEquipo("River");
+		partido = new Partido(equipoGanador, equipoPerdedor, arbitro, true, 3, 1);
 
+		partido.calcularPuntos();
+
+		assertEquals(3, equipoGanador.getPuntosTotales(), 0.0);
+		assertEquals(0, equipoPerdedor.getPuntosTotales(), 0.0);
+	}
+
+	@Test
+	public void calcularLosPuntosTablaPorPartidoPerdidoEnTieBreak() throws PartidoInvalidoException {
+		Equipo equipoGanador = liga.registrarEquipo("Boca");
+		Equipo equipoPerdedor = liga.registrarEquipo("River");
+		partido = new Partido(equipoPerdedor, equipoGanador, arbitro, true, 2, 3);
+
+		partido.calcularPuntos();
+
+		assertEquals(1, equipoPerdedor.getPuntosTotales(), 0.0);
+		assertEquals(2, equipoGanador.getPuntosTotales(), 0.0);
 	}
 
 	@Test
 	public void calcularElViaticoFinalDelArbitroConAumentoDePlayOffs() {
+		Equipo equipoLocal = liga.registrarEquipo("Boca");
+		Equipo equipoVisitante = liga.registrarEquipo("River");
+		partido = new Partido(equipoLocal, equipoVisitante, arbitro, true, 2, 3);
 
+		assertEquals(24000.0, partido.calcularViaticoArbitro(), 0.0);
 	}
+
 
 	// Alta de Usuario
 
